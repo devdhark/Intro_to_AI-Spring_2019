@@ -1,0 +1,14 @@
+LAB=$1
+if [ ! -z "$LAB" -a "$LAB"!=" " ]; then
+	STUDENT=$(echo $USER | tr '[:lower:]' '[:upper:]')
+	echo Checking $LAB submissions for $STUDENT
+	RESULT=$(aws s3 ls s3://eecs348/2019spring/Submissions/$LAB/ | sed 's/\r//g' | grep $STUDENT)
+	if [ ! -z "$RESULT" -a "$RESULT"!=" " ]; then
+		echo "$RESULT"
+	else
+		echo No submissions found
+	fi 
+else
+	echo error: Missing Lab reference 
+	echo usage: ./checkSubmission [Lab reference]
+fi

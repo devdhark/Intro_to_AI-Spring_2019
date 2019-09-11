@@ -1,0 +1,27 @@
+#!/bin/bash
+YEAR=$(echo 2019)
+QUARTER=$(echo spring)
+BUCKET=$(echo "$YEAR$QUARTER")
+echo "NU EECS 348 - Introduction to Artificial Intelligence student station configuration tool"
+ID=$(echo $USER)
+aws s3 cp s3://eecs348/$BUCKET/student_list.csv ~/.eecs348/student_list.csv >/dev/null
+S=$(cat ~/.eecs348/student_list.csv | grep $ID)
+rm ~/.eecs348/student_list.csv
+if [ ! -z "$S" -a "$S"!=" " ]; then
+	STUDENT=$(echo $S | cut -d "," -f 2)
+	echo Found registration: $STUDENT 
+	PWD=$(echo "$RANDOM$RANDOM$RANDOM")
+	REGISTRATIONID=$(echo "$RANDOM$RANDOM$RANDOM")
+	REGISTRATION=$(echo ${STUDENT// /_}'_'$ID'_'$REGISTRATIONID | tr '[:lower:]' '[:upper:]')
+	mkdir ~/.eecs348 -p
+	echo $REGISTRATION | tr '[:lower:]' '[:upper:]' > ~/.eecs348/student_data
+	echo "$BUCKET" > ~/.eecs348/quarter_data
+	echo "$PWD" > ~/.eecs348/security_data
+	echo "Configuration Finished"
+	echo "Registering student data to server...."
+	aws s3 cp ~/.eecs348/security_data s3://eecs348/$BUCKET/Registration/$REGISTRATION >/dev/null
+	echo "done!"
+else
+        echo "Student registration not found, verify the student id"
+fi
+

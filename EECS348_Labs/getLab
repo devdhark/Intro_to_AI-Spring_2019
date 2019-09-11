@@ -1,0 +1,27 @@
+#!/bin/bash
+echo "getLab utility" 
+langerr=""
+case "$2" in
+"python") echo "Language python"
+	;;
+"c") echo "Language c"
+	;;
+"") echo "ERROR: NO LANGUAGE SPECIFIED"
+	echo "usage: getLab Lab# [python,c]" 
+	langerr="yes"
+	;;
+*) echo "ERROR: WRONG LANGUAGE SPECIFIED"
+	echo "usage: getLab Lab# [python,c]" 
+	langerr="yes"
+	;;
+esac
+if [ "" == "$langerr" ];then 
+	rm Labs/$1 -r 2> /dev/null
+	mkdir Labs -p >/dev/null
+	echo Fetching $1 code, language $2
+	aws s3 cp s3://eecs348/Labs/$1_$2.zip Labs/$1.zip >/dev/null
+	echo Unpacking code
+	unzip Labs/$1.zip -d Labs> /dev/null
+	rm Labs/$1.zip
+	echo done!
+fi

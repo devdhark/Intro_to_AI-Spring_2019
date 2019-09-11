@@ -1,0 +1,41 @@
+#!/bin/bash
+ERROR='\033[0;31m'
+SUCCESS='\033[0;32m'
+NC='\033[0;0m'
+
+lang=""
+
+if [ -e Labs/$1/src/main.py ]; then
+	lang="python"
+fi
+
+if [ -e Labs/$1/src/main.c ]; then
+	lang="c"
+fi
+
+if [ "" == "$lang" ]; then
+	echo "No files found for $1"
+else
+	echo "Language detected: $lang"
+
+	if [ "$lang" == "c" ];then
+		mkdir Labs/$1/bin -p
+		echo "Building $1"
+		if g++ Labs/$1/src/main.c -o Labs/$1/bin/$1; then
+			echo "Build succeed, starting test"
+			if ./Labs/$1/bin/$1; then
+				echo -e "Result: ${SUCCESS}Lab passed all tests${NC}"
+			else
+				echo -e "Result: ${ERROR}Lab tests failed${NC}"
+			fi
+		fi
+	else
+		python Labs/$1/src/main.py
+		res=$?
+		if [ "$res" == "0" ]; then
+			echo -e "Result: ${SUCCESS}Lab passed all tests${NC}"
+		else
+			echo -e "Result: ${ERROR}Lab tests failed${NC}"
+		fi	
+	fi
+fi
